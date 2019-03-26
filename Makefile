@@ -16,6 +16,14 @@ else
 HAS_CONDA=True
 endif
 
+ifeq (,$(shell which kaggle))
+HAS_KAGGLE=False
+else
+HAS_KAGGLE=True
+endif
+
+
+
 #################################################################################
 # COMMANDS                                                                      #
 #################################################################################
@@ -44,6 +52,16 @@ ifeq (default,$(PROFILE))
 	aws s3 sync data/ s3://$(BUCKET)/data/
 else
 	aws s3 sync data/ s3://$(BUCKET)/data/ --profile $(PROFILE)
+endif
+
+sync_data_from_kaggle:
+ifeq (True,$(HAS_KAGGLE))
+	kaggle competitions download -c quora-question-pairs -p ./data/raw/
+	unzip ./data/raw/\*.zip -d ./data/raw/
+	rm ./data/raw/*.zip
+	@echo "Files download and unziped in folder ./data/raw/"
+else
+	@echo "WARNING: Install Kaggle-API and configure kaggle.json inside profile/account in Kaggle site"
 endif
 
 ## Download Data from S3
