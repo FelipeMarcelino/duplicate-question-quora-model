@@ -1,1 +1,8 @@
-output_filepath: ../../data/processed/processed.csv
+filepath:
+  input_filepath: ./data/raw/train.csv
+  interim_filepath: ./data/interim/interim.csv
+  output_filepath: ./data/processed/processed.csv
+operations:
+  tokenization: [question2]
+  lemmatization: 
+  stemming: 

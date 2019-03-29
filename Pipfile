@@ -6,7 +6,7 @@ verify_ssl = true
 [dev-packages]
 neovim = "*"
 jedi = "*"
-prospector = "*"
+prospector = {extras = ["with_everything"],version = "*"}
 bandit = "*"
 black = "*"
 pydocstyle = "*"
@@ -18,6 +18,12 @@ torchvision = "*"
 pandas = "*"
 python-dotenv = "*"
 pyyaml = "*"
+black = "*"
+neovim = "*"
+spacy = "*"
 
 [requires]
 python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true
