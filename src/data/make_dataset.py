@@ -10,9 +10,9 @@ from dotenv import find_dotenv, load_dotenv
 
 from dataset import Data
 
-sys.path.append(os.path.join(os.path.dirname(sys.path[0]), "config"))
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]), "."))
 
-from manage_args import manage_arguments  # isort:skip
+from config.manage_args import manage_arguments  # isort:skip
 
 
 def CommandWithConfigFile(config_filepath_param_name):
@@ -36,11 +36,11 @@ def CommandWithConfigFile(config_filepath_param_name):
 
 
 @click.command(cls=CommandWithConfigFile("config_filepath"))
-@click.option("--input_filepath","--if", type=click.Path(), default=None)
-@click.option("--output_filepath","--of", type=click.Path(), default=None)
-@click.option("--interim_filepath","--if",type=click.Path(), default=None)
-@click.option("--config_filepath","--cf", type=click.Path(), default="./src/config/default.yaml")
-@click.option("--tokenization","--to", multiple=True, default=None)
+@click.option("--input_filepath", "--input", type=click.Path(), default=None)
+@click.option("--output_filepath", "--output", type=click.Path(), default=None)
+@click.option("--interim_filepath", "--interim", type=click.Path(), default=None)
+@click.option("--config_filepath", "--config", type=click.Path(), default="./src/config/default.yaml")
+@click.option("--tokenization", "--tok", multiple=True, default=None)
 def main(input_filepath, output_filepath, interim_filepath, config_filepath, tokenization):
     """
     Turns raw data locate in .../raw into processed data locate in .../processed
@@ -48,29 +48,33 @@ def main(input_filepath, output_filepath, interim_filepath, config_filepath, tok
     Keyword arguments:
     input_filepath -- filepath of raw/input data
     output_filepath -- filepath to put processed data
-    interim_filepath -- filepath to interim/intermediary file
+    interim_filepath -- filepath to folder to save interim/intermediary file
     config_filepath -- filepath to config_file used to set options executions
     tokenization -- columns to apply operation tokenization
+    save_interim_files -- save each operation to separate files (append operation into final's filename)
     """
     logger = logging.getLogger(__name__)
     if interim_filepath is not None:
         logger.info("Making final data set from interim data: {0}".format(str(interim_filepath)))
     else:
-        logger.info("Making final data set from raw data: {}".format(str(input_filepath)))
+        logger.info("Making final data set from raw data: {0}".format(str(input_filepath)))
+
     logger.info("Processed file will be save in: {0}".format(str(output_filepath)))
 
     with open(config_filepath, "r") as stream:
         try:
             config_data = yaml.safe_load(stream)
-            print(config_data)
         except yaml.YAMLError as exc:
             print(exc)
 
     # Manage arguments passed by user with config file yaml
-    manage_arguments(config_data, tokenization)
-    print(config_data)
+    manage_arguments(config_data, tokenization, input_filepath, output_filepath, interim_filepath)
 
-    data = Data(input_filepath, output_filepath, config_data["operations"])
+    # Load data
+    data = Data(tokenization, input_filepath, output_filepath, interim_filepath)
+
+    # Apply operations in file
+    data.apply_operations()
 
 
 if __name__ == "__main__":

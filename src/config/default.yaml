@@ -1,8 +1,6 @@
-filepath:
+filepaths:
   input_filepath: ./data/raw/train.csv
-  interim_filepath: ./data/interim/interim.csv
+  interim_filepath: ./data/interim/
   output_filepath: ./data/processed/processed.csv
 operations:
-  tokenization: [question2]
-  lemmatization: 
-  stemming: 
+  tokenization: [question2,question1]

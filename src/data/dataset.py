@@ -1,22 +1,30 @@
 import pandas  as pd
+import sys
+import os
 
-from operations import Operations
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]), ""))
+
+from features.build_features import Operations
 
 class Data:
-    def __init__(self, input_filepath, output_filepath, operations):
+    def __init__(self, tokenization,input_filepath,interim_filepath, output_filepath ):
         self.__input_filepath = input_filepath
+        self.__interim_filepath = interim_filepath
         self.__output_filepath = output_filepath
+
+        # Get name of file without filepath and .csv extension
+        self.__filename = str(input_filepath).split('/')[-1].replace(".csv","")
         self.__data = None
-        self.__operations = Operations(tokenization=operations['tokenization'],stemming=operations['stemming'],lemmatization=operations['lemmatization'])
+        self.__operations = Operations(tokenization=tokenization)
 
-        # Open file and apply operations into data
+        # Open file
         self.__open_file()
-        self.__operations.apply_operations(self.__data)
-
-
 
     def __open_file(self):
         self.__data = pd.read_csv(self.__input_filepath)
+
+    def apply_operations(self):
+        self.__operations.apply_operations(self.__data, self.__interim_filepath, self.__filename)
 
     def get_input_filepath(self):
         return self.__input_filepath
